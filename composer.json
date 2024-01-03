@@ -14,7 +14,8 @@
         "symfony/dotenv": "^7.0",
         "runtime/swoole": "^0.4.0",
         "ext-pdo": "*",
-        "psr/container": "^2.0"
+        "psr/container": "^2.0",
+      "ext-sockets": "*"
     },
     "autoload": {
         "psr-4": {
@@ -29,5 +30,9 @@
         "allow-plugins": {
             "symfony/runtime": true
         }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10",
+        "upscale/swoole-blackfire": "^4.2"
     }
 }

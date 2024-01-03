@@ -1,40 +1,33 @@
 <?php
 return [
     'http_server' => [
-        'host' => '127.0.0.1',
+        'host' => 'http://localhost',
         'port' => 9501,
         'mode' => 1,
         'options' => [
 
             /**
-             * If use mode 1 or base mode just comment the options
+             * If you use mode 1 or base mode just comment the Advance options
+             * this recommended when dealing with I/O Bound operation
              */
 
+            'worker_num' => 8,
+            'max_connection' => 1024,
+            'enable_coroutine' => true,
+            'max_coroutine' => 5000,
 
             /**
              * Setup for mode 2 or process 2
+             * this recommended when dealing with CPU Bound operation
              */
 
-//            'reactor_num' => 2,
-//            'worker_num' => 4,
-//            'backlog' => 128,
-//            'max_request' => 100,
-//            'dispatch_mode' => 3,
-//            'max_coroutine' => 3000,
-//            'open_tcp_keepalive' => true,
-//            'tcp_keepidle' => 600,
-//            'tcp_keepinterval' => 60,
-//            'tcp_keepcount' => 5,
-//            'tcp_fastopen' => true,
-//            'max_wait_time' => 60,
-//            'reload_async' => true,
+              'dispatch_mode' => 1,
+              'reload_async' => true,
 
         /**
          * Setup for ssl secure connection
          */
             'open_http2_protocol' => false,
-
-
         ],
     ]
 ];

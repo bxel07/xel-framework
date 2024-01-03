@@ -1,9 +1,11 @@
 <?php
 
-use Setup\bootstrap\bootstrap;
+use Setup\bootstrap\bootstrap_rev_1;
+
+
 require __DIR__."/../vendor/autoload.php";
 
-$app = new bootstrap();
+
 
 /**
  * Container injector
@@ -18,12 +20,17 @@ $app = new bootstrap();
 /**
  * DB Pool Connection
  */
-$connectionDriver = require __DIR__.'/../setup/config/database.php';
+
+
 
 /**
  * Launch Http Server and database connection
  */
-$app
-    ->setupDatabasePool()
-    ->setupServer()
-    ->run();
+
+// $app = new bootstrap_rev_1();
+// $app->setupServer()->run();
+
+// Example of usage
+$bootstrap = (new bootstrap_rev_1())->setupServer();
+$bootstrap->run();
+

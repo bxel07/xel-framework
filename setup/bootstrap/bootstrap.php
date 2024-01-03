@@ -7,7 +7,6 @@ namespace Setup\bootstrap {
     use Swoole\Coroutine\Channel;
     use Swoole\Coroutine as run;
     use Swoole\Coroutine as go;
-    use Swoole\Timer;
 
     class bootstrap
     {
@@ -64,19 +63,12 @@ namespace Setup\bootstrap {
             // Start listening to requests
             $this->http->on('request', function ($request, $response) {
                 // Handle the request using the database connection pool
-                go\go(function () use ( $request, $response){
+                $schedule = new go\Scheduler();
+                $schedule->add(function () use ($request, $response){
                     $this->handleRequest($request, $response);
-
                 });
-            });
 
-            $this->http->on('receive', function (Server $serv, $fd, $reactor_id, $data) {
-
-                echo "[#" . $serv->worker_id . "]\tClient[$fd] receive data: $data\n";
-
-                Timer::tick(5000, function () {
-                    echo 'tick';
-                });
+               $schedule->start();
             });
 
             // Start the server
@@ -88,28 +80,30 @@ namespace Setup\bootstrap {
          */
         private function handleRequest($request, $response): void
         {
+            go(function () use ($request, $response) {
+                $pdo = $this->pool->pop();
+
+                if (!$pdo) {
+                    $response->status(500);
+                    $response->end("Internal Server Error: Unable to get a database connection");
+                    return;
+                }
+
+
+                // Perform a simple query
+                $stmt = $pdo->query('SELECT * FROM users');
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Set the response content type
+                $response->header('Content-Type', 'application/json');
+
+                // Send the query result as JSON response
+                $response->end(json_encode($result));
+
+                // Release the connection back to the pool
+                $this->pool->push($pdo);
+            });
             // Get a connection from the pool
-            $pdo = $this->pool->pop();
-
-            if (!$pdo) {
-                $response->status(500);
-                $response->end("Internal Server Error: Unable to get a database connection");
-                return;
-            }
-
-
-            // Perform a simple query
-            $stmt = $pdo->query('SELECT * FROM users');
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Set the response content type
-            $response->header('Content-Type', 'application/json');
-
-            // Send the query result as JSON response
-            $response->end(json_encode($result));
-
-            // Release the connection back to the pool
-            $this->pool->push($pdo);
 
         }
     }
